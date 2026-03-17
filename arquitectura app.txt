@@ -1,0 +1,63 @@
+DELIVERY-COUPONS-PRO - ARQUITECTURA Y FLUJO
+===========================================
+
+1) ESTRUCTURA PRINCIPAL
+-----------------------
+delivery-coupons-pro/
+  scraper/
+    picodi.py        -> Ofertas/cupones desde Picodi (PedidosYa/Rappi/Uber Eats)
+    chocale.py       -> Guia mensual de descuentos delivery (Chile)
+    banks.py         -> Sitios bancarios/tarjetas + fallback por emisor
+  database/
+    db.py            -> SQLite: crear tabla, guardar deduplicado, listar cupones
+  bot/
+    telegram_bot.py  -> Formatea y envia mensajes a Telegram
+  dashboard/
+    dashboard.py     -> UI Streamlit con filtros, tabla y cobertura bancos
+  main.py            -> Orquestador (scrapers -> DB -> Telegram)
+  scheduler.py       -> Ejecuta main.run() al iniciar y cada 24 horas
+  config.py          -> TOKEN Telegram, CHAT_ID, nombre DB
+  requirements.txt   -> Dependencias Python
+
+
+2) DIAGRAMA DE FLUJO
+--------------------
+[scheduler.py] ----\
+                    \
+[main.py manual] -----> [main.run()]
+                         |
+                         +--> [database.init_db()]
+                         |
+                         +--> [scraper.banks.get_bank_delivery_discounts()]
+                         +--> [scraper.picodi.get_picodi()]
+                         +--> [scraper.chocale.get_chocale_delivery_discounts()]
+                         |
+                         +--> merge de ofertas
+                         +--> save_coupon() (INSERT OR IGNORE por code)
+                         |      |
+                         |      +--> nuevos -> lista new_coupons
+                         |
+                         +--> [bot.send_coupons(new_coupons)]
+                                |
+                                +--> formato: app | porcentaje/cupon | banco | dia
+                                +--> envio Telegram (solo cupones nuevos)
+
+
+3) FLUJO DE EJECUCION (PRACTICO)
+--------------------------------
+A) Ejecucion manual (una vez):
+   .\venv\Scripts\python.exe main.py
+   - Lee fuentes
+   - Guarda en DB
+   - Envia solo nuevos a Telegram
+
+B) Ejecucion automatica:
+   .\venv\Scripts\python.exe -u scheduler.py
+   - Corre una vez al iniciar
+   - Luego repite cada 24 horas
+
+C) Visualizacion dashboard:
+   .\venv\Scripts\python.exe -m streamlit run dashboard\dashboard.py
+   - Muestra cupones guardados en SQLite
+   - Filtros por app, banco/tarjeta, fuente, descuento, texto
+   - Tabla de cobertura de bancos monitoreados
