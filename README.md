@@ -18,11 +18,25 @@ pip install -r requirements.txt
 
 ## Configuracion
 
-Revisa `config.py`:
+Usa variables de entorno (recomendado) con un archivo `.env` local:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edita `.env` con tus valores reales:
 
 - `TELEGRAM_TOKEN`
 - `CHAT_ID`
 - `DATABASE`
+
+Opcional en PowerShell (solo sesion actual):
+
+```powershell
+$env:TELEGRAM_TOKEN="tu_token"
+$env:CHAT_ID="tu_chat_id"
+$env:DATABASE="cupones.db"
+```
 
 ## Ejecutar una corrida manual
 

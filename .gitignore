@@ -1,0 +1,17 @@
+# Local secrets
+.env
+
+# Local runtime files
+.scheduler.lock
+dashboard.out
+dashboard.err
+scheduler.out
+scheduler.err
+cupones.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtualenv
+venv/

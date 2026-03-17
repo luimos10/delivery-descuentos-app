@@ -16,7 +16,7 @@ delivery-coupons-pro/
     dashboard.py     -> UI Streamlit con filtros, tabla y cobertura bancos
   main.py            -> Orquestador (scrapers -> DB -> Telegram)
   scheduler.py       -> Ejecuta main.run() al iniciar y cada 24 horas
-  config.py          -> TOKEN Telegram, CHAT_ID, nombre DB
+  config.py          -> Lee TELEGRAM_TOKEN, CHAT_ID y DATABASE desde entorno/.env
   requirements.txt   -> Dependencias Python
 
 

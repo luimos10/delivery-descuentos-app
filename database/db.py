@@ -10,7 +10,8 @@ def _ensure_column(conn, table_name, column_name, column_type):
         row[1] for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()
     }
     if column_name not in columns:
-        conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
+        conn.execute(
+            f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
 
 
 def init_db():
