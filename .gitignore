@@ -1,17 +1,43 @@
-# Local secrets
+# Secrets and local env
 .env
+.env.*
+!.env.example
 
-# Local runtime files
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+
+# Build / tooling artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Runtime artifacts
 .scheduler.lock
 dashboard.out
 dashboard.err
 scheduler.out
 scheduler.err
-cupones.db
+*.log
 
-# Python
-__pycache__/
-*.pyc
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
 
-# Virtualenv
-venv/
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

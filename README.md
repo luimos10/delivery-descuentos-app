@@ -1,14 +1,36 @@
 # Delivery Coupons Pro
 
-Proyecto para scrapear cupones, guardarlos en SQLite, enviarlos por Telegram y verlos en un dashboard de Streamlit.
-Fuentes actuales: páginas oficiales de bancos/tarjetas en Chile + Picodi (PedidosYa/Rappi/Uber Eats) + Chócale (guía mensual de delivery y descuentos bancarios).
+Scraper de cupones de delivery en Chile con persistencia en SQLite, notificaciones por Telegram y dashboard en Streamlit.
+
+## Qué hace
+
+- Lee promociones desde fuentes bancarias + Picodi + Chócale.
+- Guarda solo registros nuevos en SQLite (sin duplicados por `code`).
+- Envía solo cupones nuevos al canal/chat de Telegram.
+- Permite filtrar, exportar y revisar cobertura en dashboard.
+
+## Estructura
+
+```text
+delivery-coupons-pro/
+  bot/                 # Envío de mensajes Telegram
+  dashboard/           # UI Streamlit
+  database/            # Acceso SQLite
+  docs/                # Documentación de arquitectura y seguridad
+  scraper/             # Recolección de fuentes externas
+  config.py            # Variables de entorno y defaults
+  main.py              # Flujo manual (scrape -> DB -> Telegram)
+  scheduler.py         # Ejecución automática cada 24h
+```
+
+Más detalle técnico: `docs/ARCHITECTURE.md`.
 
 ## Requisitos
 
 - Windows + PowerShell
-- Python 3.14 (o compatible con tu entorno virtual)
+- Python 3.11+ (recomendado)
 
-## Instalacion
+## Instalación
 
 ```powershell
 python -m venv venv
@@ -16,49 +38,44 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-## Configuracion
-
-Usa variables de entorno (recomendado) con un archivo `.env` local:
+## Configuración
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Edita `.env` con tus valores reales:
+Variables necesarias en `.env`:
 
 - `TELEGRAM_TOKEN`
 - `CHAT_ID`
-- `DATABASE`
+- `DATABASE` (por defecto: `cupones.db`)
 
-Opcional en PowerShell (solo sesion actual):
+## Ejecución
 
-```powershell
-$env:TELEGRAM_TOKEN="tu_token"
-$env:CHAT_ID="tu_chat_id"
-$env:DATABASE="cupones.db"
-```
-
-## Ejecutar una corrida manual
+Corrida manual:
 
 ```powershell
 .\venv\Scripts\python.exe main.py
 ```
 
-## Ejecutar scheduler (inmediato + cada 24 horas)
+Scheduler (inmediato + cada 24h):
 
 ```powershell
 .\venv\Scripts\python.exe -u scheduler.py
 ```
 
-## Ejecutar dashboard
+Dashboard:
 
 ```powershell
 .\venv\Scripts\python.exe -m streamlit run dashboard\dashboard.py
 ```
 
-## Comportamiento actual
+## Checklist antes de subir a GitHub
 
-- Solo envía cupones nuevos (evita duplicados con SQLite).
-- Agrupa cupones en mensajes para evitar rafagas de muchos mensajes.
-- El scheduler ejecuta una corrida al iniciar y luego cada 24 horas.
-- Incluye ofertas de Uber Eats y Rappi, además de beneficios bancarios de: BancoEstado, Banco de Chile, Banco Falabella, Tenpo, MACH, Banco Ripley, Tarjeta Lider Bci y Tarjeta Cencosud (según promociones publicadas vigentes en sus sitios/fuentes).
+1. Verificar que `.env` no esté trackeado.
+2. Verificar que `*.db`, `__pycache__/` y `venv/` no estén trackeados.
+3. Ejecutar validación rápida:
+   ```powershell
+   python -m py_compile main.py scheduler.py config.py bot\telegram_bot.py database\db.py scraper\*.py dashboard\dashboard.py
+   ```
+4. Confirmar que no haya secretos en commits/historial.
